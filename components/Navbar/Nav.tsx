@@ -41,7 +41,7 @@ export default function Nav() {
       }`}
     >
       <div className="max-w-5xl mx-auto flex items-center justify-between px-6">
-        <span className="font-serif italic text-lg text-[#2B2A28] tracking-wide">J &amp; Y</span>
+        <span className="font-serif italic text-lg text-[#2B2A28] tracking-wide">K &amp; R</span>
 
         <div className="hidden md:flex gap-8">
           {LINKS.map((l) => (

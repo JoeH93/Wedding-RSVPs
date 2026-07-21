@@ -7,7 +7,7 @@ const DETAILS = [
     time: "4:30 PM",
     venue: "Saint Charbel Annaya",
     note: "Arrive by 4:15 PM — seating is unassigned.",
-    Image: "",
+    Image: "/Church.jpeg",
     Location:
       "https://maps.google.com/maps?vet=10CAAQoqAOahcKEwjQoo-KudKVAxUAAAAAHQAAAAAQBQ..i&pvq=CgsvZy8xdGQxMDl2diITCg1zYWludCBjaGFyYmVsEAIYAw&lqi=Ch1zYWludCBjaGFyYmVsIGFubmF5YSBsb2NhdGlvbkjazsDA5YCAgAhaHhAAEAEYABgBIhRzYWludCBjaGFyYmVsIGFubmF5YZIBD2NhdGhvbGljX2NodXJjaJoBRENpOURRVWxSUVVOdlpFTm9kSGxqUmpsdlQyMWFWRkZZUmxCTmVsbDRUMGQ0U1U1Vk1YRlJWVEZwVlZjNWRtTkZSUkFC-gEECAAQNw&fvr=1&cs=0&um=1&ie=UTF-8&fb=1&gl=lb&sa=X&ftid=0x151f50884ea0226d:0x488e56988fefb750",
   },
@@ -16,7 +16,7 @@ const DETAILS = [
     time: "5:45 PM",
     venue: "Bar Du Port",
     note: "Drinks, bites, and a live trio.",
-    Image: "",
+    Image: "/Restaurant.jpg",
     Location: "https://maps.app.goo.gl/sTeEktRnwx4W6aY1A",
   },
   {
@@ -24,7 +24,15 @@ const DETAILS = [
     time: "2:30 PM",
     venue: "Lala Land",
     note: "Family and Friends Gathering at home.",
-    Image: "",
+    Image: "/brideHouse.webp",
+    Location: "https://maps.app.goo.gl/t92JTBjYMpaVT5co8",
+  },
+  {
+    label: "Groom's House",
+    time: "2:30 PM",
+    venue: "Krikita Land",
+    note: "Family and Friends Gathering at home.",
+    Image: "/groomHouse.webp",
     Location: "https://maps.app.goo.gl/t92JTBjYMpaVT5co8",
   },
 ];
@@ -46,7 +54,7 @@ export default function Section2() {
         <Divider />
 
         {/* itinerary */}
-        <div className="grid md:grid-cols-3 gap-8 text-left mt-4">
+        <div className="grid md:grid-cols-4 gap-8 text-left mt-4">
           {DETAILS.map((d) => (
             <div
               key={d.label}

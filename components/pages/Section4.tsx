@@ -2,6 +2,7 @@
 import { useState, FormEvent } from "react";
 import Divider from "../Divider/Divider";
 import { googleSheetDataType } from "@/types/googleSheetDataType";
+import { useSearchParams } from "next/navigation";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -9,20 +10,45 @@ const INITIAL_DATA: googleSheetDataType = {
   guestName: "",
   attending: true,
   numberAttending: 1,
-  dietary: "",
   note: "",
 };
+
+// Update with your actual Whish Money details
+const WHISH_NAME = "Jane Doe";
+const WHISH_NUMBER = "+961 XX XXX XXX";
 
 export default function Section4() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState<googleSheetDataType>(INITIAL_DATA);
+  const [copied, setCopied] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  const guestParam = searchParams.get("guest");
+  const maxParam = searchParams.get("max");
+
+  const guestName = guestParam ? decodeURIComponent(guestParam) : null;
+
+  const parsedMax = maxParam ? parseInt(maxParam, 10) : NaN;
+  const maxAttendees = Number.isFinite(parsedMax) && parsedMax > 0 ? parsedMax : null;
 
   function updateField<K extends keyof googleSheetDataType>(
     field: K,
     value: googleSheetDataType[K]
   ) {
     setData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(WHISH_NUMBER);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API can fail on non-HTTPS/older browsers — the number
+      // is still visible on screen for the guest to copy manually.
+    }
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -36,8 +62,12 @@ export default function Section4() {
       }
       if (data.attending && data.numberAttending <= 0) {
         throw new Error("Please enter a valid number of guests.");
-      }      
-      
+      }
+
+      if (data.attending && maxAttendees && data.numberAttending > maxAttendees) {
+        throw new Error(`Maximum number of attendees is ${maxAttendees}.`);
+      }
+
       const res = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -56,12 +86,25 @@ export default function Section4() {
   }
 
   return (
-    <section id="rsvp" className="py-24 px-6 bg-[#FBF7F0]">
+    <section id="rsvp" className="py-24 px-6 bg-[#FBF7F0]/80 backdrop-blur-sm">
       <div className="max-w-xl mx-auto text-center">
         <p className="uppercase tracking-[0.3em] text-xs text-[#8A9A82] mb-3">
-          Kindly Reply
+          {guestName ? "A Personal Invitation" : "Kindly Reply"}
         </p>
-        <h2 className="font-serif text-3xl md:text-4xl text-[#2B2A28]">RSVP</h2>
+
+        <h2 className="font-serif text-3xl md:text-4xl text-[#2B2A28]">
+          {guestName ? `Dear ${guestName},` : "RSVP"}
+        </h2>
+
+        <p className="mt-4 text-[#2B2A28]/80 leading-relaxed">
+          We would be so honored to have you join us on our special day.
+          {maxAttendees
+            ? maxAttendees === 1
+              ? " This invitation is for one guest."
+              : ` This invitation includes up to ${maxAttendees} guests.`
+            : ""}
+        </p>
+
         <Divider />
 
         {status === "success" ? (
@@ -133,27 +176,14 @@ export default function Section4() {
 
             <div>
               <label className="block text-xs uppercase tracking-[0.15em] text-[#2B2A28]/70 mb-1.5">
-                Dietary Restrictions / Meal Preference
-              </label>
-              <input
-                name="dietary"
-                value={data.dietary}
-                onChange={(e) => updateField("dietary", e.target.value)}
-                placeholder="Vegetarian, gluten-free, none..."
-                className="w-full border border-[#2B2A28]/20 rounded-md px-4 py-3 text-base bg-white/60 focus:outline-none focus:border-[#B08D57]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-[0.15em] text-[#2B2A28]/70 mb-1.5">
-                Song Request or Note (optional)
+                Note (optional)
               </label>
               <textarea
                 name="note"
                 rows={3}
                 value={data.note}
                 onChange={(e) => updateField("note", e.target.value)}
-                placeholder="Play this and you'll never get us off the dance floor..."
+                placeholder="Drop here your what's in your mind..."
                 className="w-full border border-[#2B2A28]/20 rounded-md px-4 py-3 text-base bg-white/60 focus:outline-none focus:border-[#B08D57]"
               />
             </div>
@@ -181,23 +211,40 @@ export default function Section4() {
           </h3>
           <p className="text-sm text-[#2B2A28]/70 mb-6">
             Your presence is truly the only gift we need — but for those
-            asking, here&apos;s where we&apos;re registered.
+            asking, here&apos;s how to send one our way.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              { name: "Amazon", href: "https://amazon.com" },
-              { name: "Crate & Barrel", href: "https://crateandbarrel.com" },
-            ].map((r) => (
-              <a
-                key={r.name}
-                href={r.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-3 min-h-[44px] flex items-center border border-[#B08D57] text-[#B08D57] text-sm uppercase tracking-[0.1em] hover:bg-[#B08D57] hover:text-white transition-colors"
-              >
-                {r.name}
-              </a>
-            ))}
+
+          <div className="border border-[#B08D57]/30 rounded-lg p-6 bg-white/40 max-w-sm mx-auto text-left">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#B08D57] mb-3 text-center">
+              Whish Money
+            </p>
+
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <span className="text-sm text-[#2B2A28]/70">Name</span>
+              <span className="font-serif text-lg text-[#2B2A28]">
+                {WHISH_NAME}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-[#2B2A28]/70">Number</span>
+              <span className="font-serif text-lg text-[#2B2A28] tracking-wide">
+                {WHISH_NUMBER}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="w-full mt-5 py-3 min-h-[44px] border border-[#B08D57] text-[#B08D57] text-sm uppercase tracking-[0.1em] hover:bg-[#B08D57] hover:text-white transition-colors"
+            >
+              {copied ? "Copied!" : "Copy Number"}
+            </button>
+
+            <p className="text-xs text-[#2B2A28]/50 mt-3 text-center">
+              Open the Whish app, choose &quot;Send Money,&quot; and search
+              this number.
+            </p>
           </div>
         </div>
       </div>

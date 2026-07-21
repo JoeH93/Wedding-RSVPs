@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
+
     const body = await request.json();
-    const { guestName, attending, numberAttending, dietary, note } = body;
+    const { guestName, attending, numberAttending, note } = body;
 
     if (!guestName || typeof attending !== "boolean") {
       return NextResponse.json(
@@ -30,7 +31,6 @@ export async function POST(request: Request) {
         guestName,
         attending: attending ? "Yes" : "No",
         numberAttending: attending ? numberAttending || "" : "",
-        dietary: dietary || "",
         note: note || "",
       }),
       // Apps Script redirects the POST once when it deploys as a web app
