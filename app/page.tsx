@@ -5,6 +5,7 @@ import Section2 from "@/components/pages/Section2";
 import Section3 from "@/components/pages/Section3";
 import Section4 from "@/components/pages/Section4";
 import Section5 from "@/components/pages/Section5";
+import Section6 from "@/components/pages/Section6";
 
 export default function Home() {
   return (
@@ -16,8 +17,8 @@ export default function Home() {
         <div className="flex flex-col gap-200 md:gap-16">
           <Section1 />
           <Section2 />
-          <Section3 />
           <Section4 />
+          <Section6 />
           <Section5 />
         </div>
       </div>
